@@ -5,7 +5,8 @@ import java.time.LocalDate;
 
 public class PortfolioTrade {
 
-  public PortfolioTrade() {  }
+  public PortfolioTrade() {
+  }
 
   public static enum TradeType {
     BUY,
@@ -40,7 +41,13 @@ public class PortfolioTrade {
     this.purchaseDate = purchaseDate;
   }
 
-  //solution
+  @Override
+  public String toString() {
+    return "PortfolioTrade [purchaseDate=" + purchaseDate + ", quantity=" + quantity + ", symbol=" + symbol
+        + ", tradeType=" + tradeType + "]";
+  }
+
+  // solution
   public String getSymbol() {
     return symbol;
   }
@@ -56,6 +63,6 @@ public class PortfolioTrade {
   public TradeType getTradeType() {
     return tradeType;
   }
-  //solution
+  // solution
 
 }
