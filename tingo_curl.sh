@@ -1,0 +1,2 @@
+1. AAPl = curl https://api.tiingo.com/tiingo/daily/aapl?token=a55716d2ff7cbbe9b320009298da04a0a01c1773
+2. GOOGl= curl https://api.tiingo.com/tiingo/daily/googl?token=a55716d2ff7cbbe9b320009298da04a0a01c1773
