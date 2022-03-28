@@ -122,9 +122,9 @@ public class PortfolioManagerApplication {
   public static List<String> debugOutputs() {
 
     String valueOfArgument0 = "trades.json";
-    String resultOfResolveFilePathArgs0 = "D:/Documents/00-Coding/00-Crio/Java/Project/Qmoney/kr-utkarsh777-ME_QMONEY_V2/qmoney/bin/test/assessments/trades.json";
-    String toStringOfObjectMapper = "com.fasterxml.jackson.databind.ObjectMapper@7d9d0818";
-    String functionNameFromTestFileInStackTrace = "mainreadFile()";
+    String resultOfResolveFilePathArgs0 = "trades.json";
+    String toStringOfObjectMapper = "ObjectMapper";
+    String functionNameFromTestFileInStackTrace = "mainReadFile";
     String lineNumberFromTestFileInStackTrace = "29:1";
 
     return Arrays.asList(new String[] { valueOfArgument0, resultOfResolveFilePathArgs0, toStringOfObjectMapper,
@@ -252,7 +252,6 @@ public class PortfolioManagerApplication {
     }
 
     Collections.sort(allTradeReturns, (x, y) -> y.getAnnualizedReturn().compareTo(x.getAnnualizedReturn()));
-
     return allTradeReturns;
   }
 
