@@ -9,7 +9,6 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -204,11 +203,98 @@ public class PortfolioManagerApplication {
     return token;
   }
 
+  // TODO: CRIO_TASK_MODULE_CALCULATIONS
+  // Now that you have the list of PortfolioTrade and their data, calculate
+  // annualized returns
+  // for the stocks provided in the Json.
+  // Use the function you just wrote #calculateAnnualizedReturns.
+  // Return the list of AnnualizedReturns sorted by annualizedReturns in
+  // descending order.
+
+  // Note:
+  // 1. You may need to copy relevant code from #mainReadQuotes to parse the Json.
+  // 2. Remember to get the latest quotes from Tiingo API.
+
+  // TODO:
+  // Ensure all tests are passing using below command
+  // ./gradlew test --tests ModuleThreeRefactorTest
+  static Double getOpeningPriceOnStartDate(List<Candle> candles) {
+    Collections.sort(candles, (x, y) -> x.getDate().compareTo(y.getDate()));
+    return candles.get(0).getOpen();
+  }
+
+  public static Double getClosingPriceOnEndDate(List<Candle> candles) {
+    Collections.sort(candles, (x, y) -> x.getDate().compareTo(y.getDate()));
+    return candles.get(candles.size() - 1).getClose();
+  }
+
+  public static List<Candle> fetchCandles(PortfolioTrade trade, LocalDate endDate, String token) {
+    String TiingoAPIurl = prepareUrl(trade, endDate, getToken());
+    RestTemplate restTemplate = new RestTemplate();
+    TiingoCandle[] arraysOfCandles = restTemplate.getForObject(TiingoAPIurl, TiingoCandle[].class);
+    List<Candle> allCandles = new ArrayList<Candle>();
+    for (Candle candle : arraysOfCandles) {
+      allCandles.add(candle);
+    }
+    return allCandles;
+  }
+
+  public static List<AnnualizedReturn> mainCalculateSingleReturn(String[] args) throws IOException, URISyntaxException {
+    List<PortfolioTrade> allTrades = readTradesFromJson(args[0]);
+    List<AnnualizedReturn> allTradeReturns = new ArrayList<AnnualizedReturn>();
+    LocalDate endDate = LocalDate.parse(args[1]);
+    for (PortfolioTrade trade : allTrades) {
+      List<Candle> candles = fetchCandles(trade, endDate, getToken());
+      double buyPrice = getOpeningPriceOnStartDate(candles);
+      double sellPrice = getClosingPriceOnEndDate(candles);
+      AnnualizedReturn returns = calculateAnnualizedReturns(endDate, trade, buyPrice, sellPrice);
+      allTradeReturns.add(returns);
+    }
+
+    Collections.sort(allTradeReturns, (x, y) -> y.getAnnualizedReturn().compareTo(x.getAnnualizedReturn()));
+
+    return allTradeReturns;
+  }
+
+  // TODO: CRIO_TASK_MODULE_CALCULATIONS
+  // Return the populated list of AnnualizedReturn for all stocks.
+  // Annualized returns should be calculated in two steps:
+  // 1. Calculate totalReturn = (sell_value - buy_value) / buy_value.
+  // 1.1 Store the same as totalReturns
+  // 2. Calculate extrapolated annualized returns by scaling the same in years
+  // span.
+  // The formula is:
+  // annualized_returns = (1 + total_returns) ^ (1 / total_num_years) - 1
+  // 2.1 Store the same as annualized_returns
+  // Test the same using below specified command. The build should be successful.
+  // ./gradlew test --tests
+  // PortfolioManagerApplicationTest.testCalculateAnnualizedReturn
+
+  public static AnnualizedReturn calculateAnnualizedReturns(LocalDate endDate, PortfolioTrade trade, Double buyPrice,
+      Double sellPrice) {
+        Double totalReturns = getTotalReturns(buyPrice, sellPrice);
+        double totalYears = getTotalYears(trade.getPurchaseDate(), endDate);
+        double exponent = 1.0 / totalYears;
+        double annualizedReturns = Math.pow((1 + totalReturns), exponent) - 1.0;
+        return new AnnualizedReturn(trade.getSymbol(), annualizedReturns, totalYears);
+  }
+
+  public static double getTotalReturns(Double buyPrice, Double sellPrice) {
+    return (sellPrice - buyPrice) / buyPrice;
+  }
+
+  public static double getTotalYears(LocalDate startDate, LocalDate endDate) {
+    long dateDiff = ChronoUnit.DAYS.between(startDate, endDate);
+    Long l = Long.valueOf(dateDiff);
+    double totalYears = l.doubleValue();
+    return totalYears / 365.0;
+  }
+
   public static void main(String[] args) throws Exception {
     Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionHandler());
     ThreadContext.put("runId", UUID.randomUUID().toString());
 
-    printJsonObject(mainReadQuotes(args));
+    printJsonObject(mainCalculateSingleReturn(args));
 
   }
 }
