@@ -46,8 +46,6 @@ public class PortfolioTrade {
         + ", tradeType=" + tradeType + "]";
   }
 
-  // solution
-  //solution
   public String getSymbol() {
     return symbol;
   }
@@ -63,6 +61,5 @@ public class PortfolioTrade {
   public TradeType getTradeType() {
     return tradeType;
   }
-  //solution
 
 }
