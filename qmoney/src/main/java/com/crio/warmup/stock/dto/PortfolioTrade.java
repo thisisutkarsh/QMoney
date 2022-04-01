@@ -47,6 +47,7 @@ public class PortfolioTrade {
   }
 
   // solution
+  //solution
   public String getSymbol() {
     return symbol;
   }
