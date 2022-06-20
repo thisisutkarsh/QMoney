@@ -8,6 +8,7 @@ HELP.md
 *.log
 *.gz
 *.class
+/__CRIO__
 
 ### STS ###
 .apt_generated
